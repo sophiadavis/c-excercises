@@ -63,6 +63,12 @@ void testEquality(const char* test_name, const StrT& s1, const StrT2& s2, bool a
     std::cout << "Passed: " << test_name << std::endl;
 }
 
+bool isA(const char& c)
+{
+    return std::strcmp(&c, "a");
+}
+
+
 int main(int, char**)
 {
     using namespace simple_string;
@@ -273,4 +279,62 @@ int main(int, char**)
     testEquality("std::strings and const char * are equal", "same"s, "same", true);
     testEquality("Strings and const char * are different", String("same"), "different", false);
     testEquality("std::strings and const char * are different", "same"s, "different", false);
+
+    String iteratorTest = "this is a test";
+    String iteratorTest2 = "this is another test";
+    for (auto& elem: iteratorTest) {
+        std::cout << elem << std::endl;
+    }
+
+    std::cout << std::boolalpha;
+    auto any_a = std::any_of(iteratorTest.begin(), iteratorTest.end(), isA);
+    auto any_a_const = std::any_of(iteratorTest.cbegin(), iteratorTest.cend(), isA);
+    assert (any_a);
+    assert (any_a_const);
+
+    bool are_equal = std::equal(iteratorTest.begin(), iteratorTest.end(), iteratorTest2.begin());
+    bool are_equal_const = std::equal(iteratorTest.cbegin(), iteratorTest.cend(), iteratorTest2.cbegin());
+    assert (!are_equal);
+    assert (!are_equal_const);
+
+    auto max_el = std::max_element(iteratorTest.begin(), iteratorTest.end(), std::greater<char>());
+    auto max_el_index = std::distance(iteratorTest.begin(), max_el);
+    auto max_el_const = std::max_element(iteratorTest.cbegin(), iteratorTest.cend(), std::greater<char>());
+    auto max_el_index_const = std::distance(iteratorTest.cbegin(), max_el_const);
+    int index_first_space = 4;
+    assert (max_el_index == index_first_space);
+    assert (max_el_index_const == index_first_space);
+
+    char t = 't';
+    int num_t = std::count(iteratorTest.begin(), iteratorTest.end(), t);
+    int num_t_const = std::count(iteratorTest.cbegin(), iteratorTest.cend(), t);
+    assert (num_t == 3);
+    assert (num_t_const == 3);
+
+    std::sort(iteratorTest.begin(), iteratorTest.end(), std::greater<char>());
+    assert (iteratorTest == "tttsssiihea   ");
+    // Const version -- doesn't compile
+    // std::sort(iteratorTest.cbegin(), iteratorTest.cend(), std::greater<char>());
+
+    std::reverse(iteratorTest.begin(), iteratorTest.end());
+    assert (iteratorTest == "   aehiisssttt");
+    // Const version -- doesn't compile
+    // std::reverse(iteratorTest.cbegin(), iteratorTest.cend());
+
+    String copyIteratorTest = iteratorTest;
+    std::random_shuffle(iteratorTest.begin(), iteratorTest.end());
+    std::cout << iteratorTest << std::endl;
+    assert (iteratorTest != copyIteratorTest);
+
+    // Const version -- doesn't compile
+    // std::random_shuffle(iteratorTest.cbegin(), iteratorTest.cend());
+
+    const char space = ' ';
+    std::remove(iteratorTest2.begin(), iteratorTest2.end(), space);
+    std::cout << iteratorTest2 << std::endl;
+    // Actual output: thisisanothertestest
+    // assert (iteratorTest2 == "thisisanothertest");
+
+    // Const version -- doesn't compile
+    // std::remove(iteratorTest2.cbegin(), iteratorTest2.cend(), space);
 }

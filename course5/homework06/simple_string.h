@@ -31,6 +31,14 @@ public:
     int length() const;
     const char *c_str() const;
 
+    typedef char * iterator;
+    typedef const char * const_iterator;
+    iterator begin() { return buffer.get(); }
+    iterator end() { return buffer.get() + l; }
+
+    const_iterator cbegin() { return buffer.get(); }
+    const_iterator cend() { return buffer.get() + l; }
+
 private:
     std::unique_ptr<char[]> buffer;
     int l = 0;
